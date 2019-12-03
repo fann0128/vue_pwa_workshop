@@ -4,7 +4,7 @@
     <div class="task" v-for="(task, i) in tasks" :key="task.text">
       <button class="task_checkbox" :class="{task_checkbox_completed: task.completed}" @click="markAsCompleted(i)"></button>
       <p class="task_text" :class="{task_text_completed: task.completed}">{{task.text}}</p>
-      <button class="task_delete" @click="deleteTask(i)">X</button>
+      <RemoveBtn :item="i" @deleteTask="deleteTask(i)"/>
     </div>
     <div class="add">
       <input type="text" placeholder="Add things" @keyup.enter="addTask" v-model="task" class="add_input">
@@ -13,8 +13,13 @@
 </template>
 
 <script>
+import RemoveBtn from './RemoveBtn.vue'
+
 export default {
   name: 'TodoList',
+  components: {
+    RemoveBtn
+  },
   data: () => ({
     task: '',
     tasks: [
@@ -80,8 +85,7 @@ export default {
   padding: 0.9rem;
 }
 
-.task_checkbox,
-.task_delete {
+.task_checkbox {
   background-color: #474143;
   border: 0;
   border-radius: 50%;
@@ -106,14 +110,5 @@ export default {
 
 .task_text_completed {
   text-decoration: line-through;
-}
-
-.task_delete {
-  background: none;
-}
-
-.task_delete:hover {
-  background-color: #ff6444;
-  color: #fff;
 }
 </style>
