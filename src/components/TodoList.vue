@@ -1,10 +1,22 @@
 <template>
   <div>
     <h1>Todo List</h1>
-    <div class="task" v-for="(task, i) in tasks" :key="task.text">
-      <button class="task_checkbox" :class="{task_checkbox_completed: task.completed}" @click="markAsCompleted(i)"></button>
-      <p class="task_text" :class="{task_text_completed: task.completed}">{{task.text}}</p>
-      <RemoveBtn :item="i" @deleteTask="deleteTask(i)"/>
+    <div class="task" v-for="(task, i) in tasks" :key="i">
+      <button 
+        class="task_checkbox" 
+        :class="{task_checkbox_completed: task.completed}" 
+        @click="markAsCompleted(i)"
+      />
+      <p 
+        class="task_text" 
+        :class="{task_text_completed: task.completed}"
+      >
+        {{task.text}}
+      </p>
+      <RemoveBtn 
+        :item="i"
+        @deleteTask="deleteTask(i)"
+        />
     </div>
     <div class="add">
       <input type="text" placeholder="Add things" @keyup.enter="addTask" v-model="task" class="add_input">
@@ -15,6 +27,15 @@
 <script>
 import RemoveBtn from './RemoveBtn.vue'
 
+const todoStorage = {
+  fetch: function () {
+    return JSON.parse(localStorage.getItem('vue-todo-list') || '[]')
+  },
+  save: function (tasks) {
+    localStorage.setItem('vue-todo-list', JSON.stringify(tasks))
+  }
+}
+
 export default {
   name: 'TodoList',
   components: {
@@ -22,24 +43,21 @@ export default {
   },
   data: () => ({
     task: '',
-    tasks: [
-      {
-        text: "Buy milk",
-        completed: true
-      },
-      {
-        text: "Buy cereals",
-        completed: true
-      },
-      {
-        text: "Buy spoons",
-        completed: false
-      },
-      {
-        text: "Make a barbecue",
-        completed: false
-      }
-    ]
+    // tasks: [
+    //   {
+    //     text: "Buy milk",
+    //     completed: true
+    //   },
+    //   {
+    //     text: "Buy cereals",
+    //     completed: true
+    //   },
+    //   {
+    //     text: "Buy spoons",
+    //     completed: false
+    //   },
+    // ],
+    tasks: todoStorage.fetch(),
   }),
   methods: {
     markAsCompleted(index) {
@@ -49,14 +67,24 @@ export default {
       this.tasks.splice(index, 1);
     },
     addTask() {
-      this.tasks.push({
-        text: this.task,
-        completed: false
-      })
+      if (this.task) {
+        this.tasks.push({
+          text: this.task,
+          completed: false
+        })
 
-      this.task = ''
+        this.task = ''
+      }
     }
-  }
+  },
+  watch: {
+    tasks: {
+      handler: function (tasks) {
+        todoStorage.save(tasks)
+      },
+      deep: true
+    }
+  },
 }
 </script>
 
@@ -83,9 +111,11 @@ export default {
   color: #474143;
   font-size: 1rem;
   padding: 0.9rem;
+  outline: none;
 }
 
 .task_checkbox {
+  outline: none;
   background-color: #474143;
   border: 0;
   border-radius: 50%;
@@ -110,5 +140,19 @@ export default {
 
 .task_text_completed {
   text-decoration: line-through;
+}
+.task_delete {
+  outline: none;
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 24px;
+  width: 24px;
+}
+
+.task_delete:hover {
+  background-color: #ff6444;
+  color: #fff;
 }
 </style>
